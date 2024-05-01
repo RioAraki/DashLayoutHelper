@@ -17,7 +17,9 @@ helper.new_row()
 
 helper.input(id="age")
 helper.input(id="gender")
+
 helper.new_row()
+
 helper.input(id="name")
 
 app.layout = dbc.Container(helper.get_layout(), fluid=True, style=border_10px)

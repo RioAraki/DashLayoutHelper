@@ -15,22 +15,20 @@ class LayoutHelper:
             (dbc.Input(id=id, **kwargs), width)
         )
 
-    def header(self,level, text, width=None, **kwargs):
-        if level not in [1,2,3,4]:
-            level = 1
+    def header(self, level, text, width=None, **kwargs):
+        header_dict = {
+            1: 'H1',
+            2: 'H2',
+            3: 'H3',
+            4: 'H4'
+        }
+        tag = header_dict.get(level, 'H1')  # Default to H1 if level is out of range
+        header = getattr(html, tag)(text, **kwargs)
+        self.__row_item_by_index[self.__current_row].append((header, width))
 
-        self.__row_item_by_index[self.__current_row].append(
-            
-        )
-
-    # def dropdown(
-    #         self, 
-    #         id, 
-    #         options=[], 
-    #         value= "", 
-    #         class_name="",
-    #         width=None):
-    #     pass
+    def dropdown(self, id, width=None):
+        
+        pass
 
     def new_row(self):
         self.__current_row += 1
@@ -38,7 +36,10 @@ class LayoutHelper:
     def get_layout(self):
         for index, row_items in self.__row_item_by_index.items():
             cur_row_list = []
-            for col_index, (item, width) in enumerate(row_items): 
+            for col_index, item_width_pair in enumerate(row_items): 
+                if len(item_width_pair) == 0:
+                    continue
+                item, width = item_width_pair
                 cur_col = dbc.Col(children=item, width=width, id=f"row{index}col{col_index}")
                 cur_row_list.append(cur_col)
             self.__layout.append(dbc.Row(cur_row_list, style=border_top(5)))
