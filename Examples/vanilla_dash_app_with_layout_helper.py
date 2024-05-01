@@ -11,6 +11,10 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 helper = LayoutHelper()
 
+helper.header(level=4, text="This is 4 of the app")
+
+helper.new_row()
+
 helper.input(id="age")
 helper.input(id="gender")
 helper.new_row()
