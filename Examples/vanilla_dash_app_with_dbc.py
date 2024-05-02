@@ -9,18 +9,17 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 # Define the layout of the app
 app.layout = dbc.Container([
     dbc.Row([
-        dbc.Col(html.H1("Simple Dash App", className="text-center mt-5 mb-4"), width=12)
+        dbc.Col(html.H1("Simple Dash App", className="text-center"), width=12)
     ]),
     dbc.Row([
         dbc.Col(
-            dbc.Input(id='input', placeholder='Enter something here!', type='text', className="mb-2"),
-            width=6, className="mx-auto"
+            dbc.Input(id='input', placeholder='Enter something here!', type='text')
         )
     ]),
     dbc.Row([
-        dbc.Col(html.Div(id='output', className="text-center"), width=6, className="mx-auto")
+        dbc.Col(html.Div(id='output', className="text-center"), width=6)
     ])
-], fluid=True)
+], fluid=False, className="")  # Add padding on the left and right sides
 
 # Define callback to update the output based on user input
 @app.callback(

@@ -16,14 +16,37 @@ helper.header(level=4, text="This is H4")
 helper.new_row()
 
 helper.input(id="age", label="input age")
-helper.input(id="gender")
-
+helper.input(id="gender", label="gender")
+helper.radioitem(
+    id="radio", 
+    label="select", 
+    options=[
+        {"label": "option1", "value": 1},
+        {"label": "option2", "value": 2},
+        {"label": "option3", "value": 3},
+    ],
+    inline=True
+)
+helper.checklist(
+    id="checklist", 
+    label="this is a checklist", 
+    options=[
+        {"label": "option1", "value": 1},
+        {"label": "option2", "value": 2},
+    ],
+    value=[1],
+    switch=True,
+    inline=True
+)
 helper.new_row()
 
-helper.input(id="name")
-helper.dropdown(id="dropdown", options=["choose", "anything"])
-
-app.layout = dbc.Container(helper.get_layout(), fluid=True, style=border_10px)
+helper.input(id="name", label="name")
+helper.dropdown(id="dropdown", label="dropdown", options=["choose", "anything"])
+helper.button(id="button", text="Submit Graph")
+app.layout = dbc.Container(
+    helper.get_layout(), 
+    fluid=False
+)
 
 # Define callback to update the output based on user input
 

@@ -1,7 +1,7 @@
 import collections
 import dash_bootstrap_components as dbc
 from dash import html
-from .LayoutCSS import border_top
+from .LayoutCSS import border_top, default_button_style
 
 class LayoutHelper:
 
@@ -23,23 +23,34 @@ class LayoutHelper:
         self.__row_item_by_index[self.__current_row].append((header, width, None))
 
 
-    def input(self, id, label=None, width=None, **kwargs):
+    def input(self, id, label, width=None, **kwargs):
         self.__row_item_by_index[self.__current_row].append(
             (dbc.Input(id=id, **kwargs), width, label)
         )
 
 
-    def dropdown(self, id, label=None, width=None, **kwargs):
+    def dropdown(self, id, label, width=None, **kwargs):
         self.__row_item_by_index[self.__current_row].append(
             (dbc.Select(id=id, **kwargs), width, label)
         )
 
 
-    def radioitem(self, id, label=None, width=None, **kwargs):
+    def radioitem(self, id, label, width=None, **kwargs):
         self.__row_item_by_index[self.__current_row].append(
-            (dbc.Select(id=id, **kwargs), width, label)
+            (dbc.RadioItems(id=id, **kwargs), width, label)
         )
 
+
+    def checklist(self, id, label, width=None, **kwargs):
+        self.__row_item_by_index[self.__current_row].append(
+            (dbc.Checklist(id=id, **kwargs), width, label)
+        )
+
+
+    def button(self, id, text, width=None, **kwargs):
+        self.__row_item_by_index[self.__current_row].append(
+            (dbc.Button(text, id=id,**kwargs), width, None)
+        )
 
     def new_row(self):
         self.__current_row += 1
@@ -54,7 +65,13 @@ class LayoutHelper:
                 item, width, label = item_width_label
                 if label != None:
                     item = [dbc.Label(label)] + [item]
-                cur_col = dbc.Col(children=item, width=width, id=f"row{index}col{col_index}")
+
+                ui_type = item.__class__.__name__
+                print(ui_type)
+                if ui_type == "Button":
+                    cur_col = dbc.Col(children=item, width=width, id=f"row{index}col{col_index}", style=default_button_style)
+                else:
+                    cur_col = dbc.Col(children=item, width=width, id=f"row{index}col{col_index}")
                 cur_row_list.append(cur_col)
             self.__layout.append(dbc.Row(cur_row_list, style=border_top(5)))
         return self.__layout
