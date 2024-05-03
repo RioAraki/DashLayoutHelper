@@ -38,15 +38,18 @@ helper.checklist(
     switch=True,
     inline=True
 )
+
 helper.new_row()
 
 helper.input(id="name", label="name")
-helper.dropdown(id="dropdown", label="dropdown", options=["choose", "anything"])
+helper.dropdown(id="dropdown", label="dropdown", options=["choose", "anything"], multi=True)
 helper.button(id="button", text="Submit Graph")
-app.layout = dbc.Container(
-    helper.get_layout(), 
-    fluid=False
-)
+
+helper.separator()
+
+
+app.layout = helper.get_layout()
+
 
 # Define callback to update the output based on user input
 
