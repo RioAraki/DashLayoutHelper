@@ -6,9 +6,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        pandas,
-        dash,
-        dash_bootstrap_components
+        "pandas",
+        "dash",
+        "dash_bootstrap_components"
     ],
     author='Yue Li',
     author_email='lhzuigao@hotmail.com',

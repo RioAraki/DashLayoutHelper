@@ -1,7 +1,7 @@
 import collections
 import dash_bootstrap_components as dbc
 
-from dash import html, dcc
+from dash import html, dcc, dash_table
 from .LayoutCSS import border_top, col_style_for_button
 
 class LayoutHelper:
@@ -65,9 +65,12 @@ class LayoutHelper:
         )
         self.new_row()
 
-    def table(self):
-        pass
+    def table(self, df, width=None):
+        self.__row_item_by_index[self.__current_row].append(
+            (dash_table.DataTable(df.to_dict("records")), width, None)
+        )
 
+        
     def graph(self):
         pass
 
