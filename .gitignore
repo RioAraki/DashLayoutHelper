@@ -1,3 +1,6 @@
 # Ignore the 'dash' folder
 dash/
 __pycache__/
+build/
+DashLayoutHelper.egg-info/
+vdash/

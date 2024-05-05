@@ -9,7 +9,7 @@ from LayoutHelper.LayoutCSS import border_10px
 # Create the Dash application instance
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-helper = LayoutHelper()
+helper = LayoutHelper(app)
 
 helper.header(level=4, text="This is H4")
 
@@ -41,6 +41,8 @@ helper.checklist(
 
 helper.new_row()
 
+group_input = helper.group_input("group")
+
 helper.input(id="name", label="name")
 helper.dropdown(id="dropdown", label="dropdown", options=["choose", "anything"], multi=True)
 helper.button(id="button", text="Submit Graph")
@@ -59,7 +61,6 @@ data = {
 df = pd.DataFrame(data)
 
 helper.table(df)
-
 
 app.layout = helper.get_layout()
 
