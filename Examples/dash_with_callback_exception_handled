@@ -1,0 +1,115 @@
+import dash
+from dash import dcc, html, Input, Output, State, dash_table
+import plotly.express as px
+import pandas as pd
+import numpy as np
+
+# using dcc.interval to keep retrieving error message with very little coupling with original app.
+
+
+# Initialize the Dash app
+app = dash.Dash(__name__)
+
+# Global variables to keep track of button clicks and error messages
+click_count = 0
+error_message = ""
+
+# Decorator to catch exceptions in callbacks
+def handle_exceptions(callback):
+    def wrapper(*args, **kwargs):
+        global error_message
+        try:
+            return callback(*args, **kwargs)
+        except Exception as e:
+            error_message = str(e)
+            return dash.no_update
+    return wrapper
+
+# Define the layout of the app
+app.layout = html.Div([
+    html.H1("Dash App with Error Handling"),
+    
+    html.Button("Generate Data", id="generate-button"),
+    dcc.Graph(id="scatter-plot"),
+    dash_table.DataTable(id="data-table"),
+    
+    html.Br(),
+    html.Div(id="error-message", style={"color": "red"}),
+    
+    html.H2("Input and Submit"),
+    dcc.Input(id="input-box", type="text"),
+    html.Button("Submit", id="submit-button"),
+    html.Div(id="input-result", style={"margin-top": "20px", "color": "blue"}),
+    
+    # Floating bubble for error messages
+    html.Div(id="floating-error-bubble", style={
+        "position": "fixed", "top": "10px", "right": "10px", "background-color": "lightgrey",
+        "padding": "10px", "border-radius": "5px", "display": "none"
+    }),
+    
+    # Interval component to check and display error messages
+    dcc.Interval(id="interval-component", interval=3*1000, n_intervals=0)
+])
+
+# Callback to handle data generation and plotting
+@app.callback(
+    Output("scatter-plot", "figure"),
+    Output("data-table", "data"),
+    Output("data-table", "columns"),
+    Input("generate-button", "n_clicks")
+)
+@handle_exceptions
+def generate_data(n_clicks):
+    global click_count
+    click_count += 1
+    
+    if click_count % 2 == 0:
+        raise Exception("Data is broken")
+    
+    # Generate random data
+    df = pd.DataFrame({
+        "x": np.random.randn(100),
+        "y": np.random.randn(100)
+    })
+    
+    fig = px.scatter(df, x="x", y="y", title="Randomly Generated Data")
+    
+    columns = [{"name": i, "id": i} for i in df.columns]
+    data = df.to_dict('records')
+    
+    return fig, data, columns
+
+# Callback to handle input submission
+@app.callback(
+    Output("input-result", "children"),
+    Input("submit-button", "n_clicks"),
+    State("input-box", "value"),
+    prevent_initial_call=True
+)
+@handle_exceptions
+def handle_input(n_clicks, value):
+    if value == "error":
+        raise Exception("Input is broken")
+    return value
+
+# Callback to update the error message in the floating bubble
+@app.callback(
+    Output("floating-error-bubble", "children"),
+    Output("floating-error-bubble", "style"),
+    Input("interval-component", "n_intervals")
+)
+def update_error_message(n_intervals):
+    global error_message
+    if error_message:
+        style = {
+            "position": "fixed", "top": "10px", "right": "10px", "background-color": "lightgrey",
+            "padding": "10px", "border-radius": "5px", "display": "block"
+        }
+        message = error_message
+    else:
+        raise dash.exceptions.PreventUpdate
+    return message, style
+
+# Run the app
+if __name__ == "__main__":
+    app.run_server(debug=True)

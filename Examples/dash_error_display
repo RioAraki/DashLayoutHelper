@@ -1,0 +1,71 @@
+import dash
+from dash import html, dcc, callback_context
+import logging
+from dash.dependencies import Output, Input
+from functools import wraps
+
+# Configure logging
+logging.basicConfig(filename='app.log', level=logging.DEBUG)
+
+app = dash.Dash(__name__)
+server = app.server  # Expose the server variable for deployments
+app._global_error_message = ""
+
+def handle_errors(output_error_id):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                result = func(*args, **kwargs)
+                return result
+            except Exception as e:
+                logging.error(f'Caught Exception: {e}')
+                app._global_error_message = f'Error: {e}'
+                # Return the original callback outputs plus the error message
+                return [dash.no_update for _ in func.__annotations__.get('return', [])] + [app._global_error_message]
+        return wrapper
+    return decorator
+
+app.layout = html.Div([
+    dcc.Input(id='input', value='initial value', type='text'),
+    html.Div(id='output'),
+    html.Div(id='global-error', style={
+        'color': 'red',
+        'position': 'fixed',
+        'top': '10px',
+        'right': '10px',
+        'background-color': 'white',
+        'border': '1px solid red',
+        'padding': '10px',
+        'border-radius': '5px',
+        'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)',
+        'z-index': '1000'
+    })  # Global error div
+])
+
+@app.callback(
+    Output('output', 'children'),
+    [Input('input', 'value')]
+)
+@handle_errors('global-error')
+def update_output(value):
+    logging.debug(f'Entering update_output callback with value: {value}')
+    if value == 'error':
+        logging.debug('Value is "error", raising ValueError')
+        raise ValueError('An error occurred!')
+    logging.debug(f'Returning value: {value}')
+    return value
+
+@app.callback(
+    Output('global-error', 'children'),
+    [Input('input', 'value')]
+)
+def update_global_error(_):
+    logging.debug('Entering update_global_error callback')
+    error_message = app._global_error_message
+    logging.debug(f'Error message: {error_message}')
+    return error_message
+
+if __name__ == '__main__':
+    logging.debug('Starting Dash app')
+    app.run_server(debug=False)

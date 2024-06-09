@@ -1,0 +1,57 @@
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output, State
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
+app = dash.Dash(__name__)
+
+# Singleton class to manage error state
+class ErrorState:
+    def __init__(self):
+        self.error = False
+        self.message = ''
+    
+    def set_error(self, message):
+        self.error = True
+        self.message = message
+
+    def clear_error(self):
+        self.error = False
+        self.message = ''
+
+error_state = ErrorState()
+
+# Example function that sets an error
+def some_function_that_might_fail():
+    # Simulate an error
+    error_state.set_error("An error occurred in the function.")
+
+app.layout = html.Div([
+    html.H1("Dash Global Error State Example"),
+    html.Button('Trigger Error', id='trigger-error-button', n_clicks=0),
+    dcc.Store(id='error-store'),
+    html.Div(id='error-message')
+])
+
+@app.callback(Output('error-store', 'data'),
+              [Input('trigger-error-button', 'n_clicks')],
+              [State('error-store', 'data')])
+def trigger_error(n_clicks, data):
+    if n_clicks > 0:
+        some_function_that_might_fail()
+        logging.info("Error state updated.")
+        return {'error': error_state.error, 'message': error_state.message}
+    return dash.no_update
+
+@app.callback(Output('error-message', 'children'),
+              [Input('error-store', 'data')])
+def display_error(data):
+    if data and data['error']:
+        return html.Div(f"Error: {data['message']}", style={'color': 'red'})
+    return html.Div("No errors.", style={'color': 'green'})
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
